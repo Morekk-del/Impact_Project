@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPACT PROJECT - Task & Progress Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        accent: {
+                            orange: '#f97316',
+                            yellow: '#f59e0b',
+                            navy: '#1e293b',
+                            blue: '#0284c7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen font-sans flex flex-col md:flex-row antialiased transition-colors duration-200">
+
+    <!-- SIDEBAR / NAVIGATION -->
+    <aside class="w-full md:w-72 bg-slate-900 text-white flex-shrink-0 flex flex-col border-r border-slate-800">
+        <!-- Logo & Title Header -->
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-teal-500/30">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base tracking-wide text-white leading-tight">IMPACT PROJECT</h1>
+                    <p class="text-xs text-teal-400 font-medium">SMK 1 Pangandaran</p>
+                </div>
+            </div>
+            <button id="themeToggle" class="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-moon text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Main Menu</div>
+            
+            <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition bg-teal-600 text-white shadow-md shadow-teal-600/20">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Overview & Stats</span>
+                </div>
+                <span id="badge-overview" class="text-xs bg-teal-700/60 text-teal-100 px-2 py-0.5 rounded-full font-bold">0%</span>
+            </button>
+
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Divisions</div>
+
+            <button onclick="switchTab('conceptors')" id="nav-conceptors" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-lightbulb w-5 text-center text-amber-400"></i>
+                    <span>1. Conceptors</span>
+                </div>
+                <span id="badge-conceptors" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">0/0</span>
+            </button>
+
+            <button onclick="switchTab('designers')" id="nav-designers" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-palette w-5 text-center text-pink-400"></i>
+                    <span>2. Designers</span>
+                </div>
+                <span id="badge-designers" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">0/0</span>
+            </button>
+
+            <button onclick="switchTab('ops')" id="nav-ops" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-boxes-packing w-5 text-center text-emerald-400"></i>
+                    <span>3. OPS Crew</span>
+                </div>
+                <span id="badge-ops" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">0/0</span>
+            </button>
+
+            <button onclick="switchTab('media')" id="nav-media" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-camera-retro w-5 text-center text-cyan-400"></i>
+                    <span>4. Media Crew</span>
+                </div>
+                <span id="badge-media" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">0/0</span>
+            </button>
+
+            <button onclick="switchTab('story')" id="nav-story" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-magnifying-glass-location w-5 text-center text-purple-400"></i>
+                    <span>5. Story Hunters</span>
+                </div>
+                <span id="badge-story" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">0/0</span>
+            </button>
+
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Tools & Export</div>
+
+            <button onclick="openExportModal()" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <i class="fa-solid fa-file-export w-5 text-center text-teal-400"></i>
+                <span>Export / Copy .TXT</span>
+            </button>
+
+            <button onclick="openGithubGuideModal()" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <i class="fa-brands fa-github w-5 text-center text-slate-400"></i>
+                <span>Deploy to GitHub Pages</span>
+            </button>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <span>Target Exec: 27-30 Oct 2026</span>
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+        
+        <!-- Top Sticky Header -->
+        <header class="sticky top-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 id="page-title" class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-teal-600"></i> Project Overview & Dashboard
+                </h2>
+                <p id="page-subtitle" class="text-xs text-slate-500 dark:text-slate-400">
+                    Sistem pemantauan & alokasi tugas Inspiration Class SMK 1 Pangandaran
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Search Bar -->
+                <div class="relative w-full sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari tugas, PIC, deadline..." class="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-0 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 dark:text-white">
+                </div>
+
+                <!-- GitHub Guide Quick Trigger -->
+                <button onclick="openGithubGuideModal()" class="px-3 py-2 bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition">
+                    <i class="fa-brands fa-github"></i>
+                    <span class="hidden md:inline">Host on GitHub</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Body -->
+        <div class="p-6 space-y-6 flex-1">
+
+            <!-- TAB 0: OVERVIEW & DASHBOARD -->
+            <div id="tab-overview" class="tab-content space-y-6">
+                <!-- Banner Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-teal-500 to-emerald-600 text-white rounded-2xl p-5 shadow-lg shadow-teal-500/10">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-teal-100">Total Progres Proyek</div>
+                        <div class="text-3xl font-extrabold mt-2" id="overall-percent">0%</div>
+                        <div class="w-full bg-teal-900/40 rounded-full h-2 mt-3 overflow-hidden">
+                            <div id="overall-bar" class="bg-white h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase text-slate-400">Total Tugas</span>
+                            <i class="fa-solid fa-list-check text-slate-400"></i>
+                        </div>
+                        <div class="text-2xl font-bold mt-2 text-slate-800 dark:text-white" id="total-tasks-count">0</div>
+                        <p class="text-xs text-slate-500 mt-1"><span id="completed-tasks-count" class="text-teal-600 font-bold">0</span> selesai</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase text-slate-400">Kunci Deadline</span>
+                            <i class="fa-solid fa-calendar-day text-amber-500"></i>
+                        </div>
+                        <div class="text-lg font-bold mt-2 text-slate-800 dark:text-white">19, 22, 26 Okt</div>
+                        <p class="text-xs text-slate-500 mt-1">Eksekusi: 27-30 Okt 2026</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase text-slate-400">Total Divisi</span>
+                            <i class="fa-solid fa-users text-blue-500"></i>
+                        </div>
+                        <div class="text-2xl font-bold mt-2 text-slate-800 dark:text-white">5 Divisi</div>
+                        <p class="text-xs text-slate-500 mt-1">25 Alokasi PIC Kerja</p>
+                    </div>
+                </div>
+
+                <!-- Division Progress Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="division-summary-cards">
+                    <!-- Cards will be populated by JS -->
+                </div>
+
+                <!-- Global Task Quick Search / Filter List -->
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base flex items-center gap-2">
+                            <i class="fa-solid fa-tasks text-teal-600"></i> Semua Daftar Tugas & Checklist
+                        </h3>
+                        <span class="text-xs text-slate-500">Centang untuk memperbarui progres</span>
+                    </div>
+
+                    <div id="all-tasks-container" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB TEMPLATE FOR DIVISIONS (Conceptors, Designers, OPS, Media, Story) -->
+            <div id="tab-division-container" class="hidden space-y-6">
+                
+                <!-- Division Header Card -->
+                <div id="div-header-card" class="rounded-2xl p-6 text-white bg-gradient-to-r from-slate-900 to-slate-800 relative overflow-hidden shadow-md">
+                    <!-- Dynamic Division Header JS -->
+                </div>
+
+                <!-- Main 2-Column Layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Left 2 Cols: Checklist & PPT Structure -->
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <!-- Interactive Checklist Card -->
+                        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-base">Checklist Pekerjaan Utama</h3>
+                                    <p class="text-xs text-slate-500">Tandai tugas yang sudah selesai untuk divisi ini</p>
+                                </div>
+                                <span id="div-progress-badge" class="px-3 py-1 bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-300 font-bold text-xs rounded-full">
+                                    0% Complete
+                                </span>
+                            </div>
+
+                            <div id="div-checklist-list" class="space-y-2.5">
+                                <!-- Checkbox list inserted via JS -->
+                            </div>
+                        </div>
+
+                        <!-- 3-Slide PPT Structure Card -->
+                        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-file-powerpoint text-orange-500"></i> Format 3 Slide Progres Presentasi
+                                </h3>
+                                <span class="text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 font-medium px-2.5 py-1 rounded-lg">
+                                    Canva / Google Slides
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="div-ppt-slides">
+                                <!-- Slides inserted via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Division Interactive Work Plan / Template Generator -->
+                        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
+                            <div id="div-interactive-tools">
+                                <!-- Interactive Work Plan table / generator inserted by JS -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right 1 Col: PIC Breakdown & Deadlines -->
+                    <div class="space-y-6">
+                        
+                        <!-- PIC Distribution Card -->
+                        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
+                            <h3 class="font-bold text-slate-900 dark:text-white text-base mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-user-gear text-teal-600"></i> Pembagian Tugas PIC (1–5)
+                            </h3>
+                            <div id="div-pic-list" class="space-y-3">
+                                <!-- PICs inserted via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Key Deadlines Timeline -->
+                        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
+                            <h3 class="font-bold text-slate-900 dark:text-white text-base mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-clock-rotate-left text-teal-600"></i> Deadline Utama Divisi
+                            </h3>
+                            <div id="div-deadlines-list" class="space-y-4">
+                                <!-- Deadlines inserted via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Notes & Remarks Persistent Textarea -->
+                        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-6 shadow-sm">
+                            <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-note-sticky text-amber-500"></i> Catatan Internal Divisi
+                            </h3>
+                            <p class="text-xs text-slate-500 mb-3">Catat kendala, link Drive, atau kebutuhan tambahan di sini (Tersimpan otomatis).</p>
+                            <textarea id="div-notes-textarea" oninput="saveNotes()" rows="4" placeholder="Ketik catatan divisi di sini..." class="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 dark:text-slate-200"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- EXPORT MODAL -->
+    <div id="exportModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <h3 class="font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-file-export text-teal-600"></i> Export & Copy Data Tugas
+                </h3>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="flex gap-2 mb-3">
+                <button onclick="setExportFormat('txt')" id="btn-fmt-txt" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white">Plain Text (.TXT)</button>
+                <button onclick="setExportFormat('md')" id="btn-fmt-md" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Markdown (.MD)</button>
+            </div>
+
+            <textarea id="exportTextarea" readonly class="w-full flex-1 p-3 bg-slate-900 text-emerald-400 font-mono text-xs rounded-xl border border-slate-700 resize-none min-h-[250px] mb-4"></textarea>
+
+            <div class="flex items-center justify-between pt-2">
+                <span class="text-xs text-slate-500" id="exportStatusText">Siap di-copy atau di-download</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="copyExportText()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-xl flex items-center gap-2 transition">
+                        <i class="fa-regular fa-copy"></i> Copy Clipboard
+                    </button>
+                    <button onclick="downloadExportText()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-xl flex items-center gap-2 transition">
+                        <i class="fa-solid fa-download"></i> Download .txt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GITHUB PAGES DEPLOYMENT GUIDE MODAL -->
+    <div id="githubModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <h3 class="font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2">
+                    <i class="fa-brands fa-github text-slate-900 dark:text-white"></i> Panduan Upload ke GitHub Pages
+                </h3>
+                <button onclick="closeGithubGuideModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                Anda dapat mempublikasikan dashboard web **IMPACT PROJECT** ini secara gratis agar bisa diakses seluruh anggota tim kelas melalui link GitHub Pages.
+            </p>
+
+            <div class="space-y-4 text-xs">
+                <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <div class="font-bold text-teal-600 dark:text-teal-400 mb-1">Langkah 1: Simpan File Dashboard</div>
+                    <p class="text-slate-600 dark:text-slate-400">Simpan seluruh kode HTML ini ke dalam satu file bernama <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-pink-500">index.html</code> di dalam folder baru komputer Anda.</p>
+                </div>
+
+                <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <div class="font-bold text-teal-600 dark:text-teal-400 mb-1">Langkah 2: Inisialisasi Repository Git</div>
+                    <p class="text-slate-600 dark:text-slate-400 mb-2">Buka Terminal / Command Prompt di folder tersebut, lalu jalankan perintah:</p>
+                    <div class="bg-slate-900 text-slate-200 font-mono p-3 rounded-lg overflow-x-auto space-y-1">
+                        <div>git init</div>
+                        <div>git add .</div>
+                        <div>git commit -m "Initial commit - Impact Project Dashboard"</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <div class="font-bold text-teal-600 dark:text-teal-400 mb-1">Langkah 3: Push ke Repository GitHub</div>
+                    <p class="text-slate-600 dark:text-slate-400 mb-2">Buat repo baru di <a href="https://github.com/new" target="_blank" class="text-teal-500 underline">github.com/new</a> dengan nama <code class="text-teal-400">impact-project</code>, lalu hubungkan:</p>
+                    <div class="bg-slate-900 text-slate-200 font-mono p-3 rounded-lg overflow-x-auto space-y-1">
+                        <div>git branch -M main</div>
+                        <div>git remote add origin https://github.com/USERNAME/impact-project.git</div>
+                        <div>git push -u origin main</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <div class="font-bold text-teal-600 dark:text-teal-400 mb-1">Langkah 4: Aktifkan GitHub Pages</div>
+                    <ol class="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-400">
+                        <li>Buka halaman repository Anda di GitHub.</li>
+                        <li>Masuk ke menu <strong>Settings</strong> &gt; <strong>Pages</strong> (di sidebar kiri).</li>
+                        <li>Pada bagian <strong>Build and deployment</strong>, atur Source ke <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">Deploy from a branch</code>.</li>
+                        <li>Pilih Branch: <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">main</code> dan folder <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">/ (root)</code>, lalu klik <strong>Save</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeGithubGuideModal()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs rounded-xl">
+                    Saya Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC & STATE MANAGEMENT -->
+    <script>
+        // DATA STRUCTURE FOR ALL DIVISIONS
+        const divisionsData = {
+            conceptors: {
+                id: "conceptors",
+                name: "Impact Conceptors",
+                role: "Konseptor Acara & Aktivitas",
+                color: "from-amber-500 to-orange-600",
+                badgeColor: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+                icon: "fa-lightbulb",
+                driveFolder: "01 - IMPACT Conceptors",
+                mission: "Merancang rangkaian kegiatan Inspiration Class yang menyenangkan, bermakna, dan sesuai kebutuhan siswa SD di Pangandaran.",
+                targets: [
+                    "Rundown 120 menit",
+                    "2-4 aktivitas STEAM",
+                    "Icebreaking & transisi",
+                    "Tujuan pembelajaran jelas",
+                    "Alur fasilitasi sederhana dan aman",
+                    "Sinkron dengan Designers dan OPS Crew"
+                ],
+                pics: [
+                    { num: 1, role: "Koordinator & rundown" },
+                    { num: 2, role: "Rancangan aktivitas 1-2 (Eksperimen & STEAM)" },
+                    { num: 3, role: "Rancangan aktivitas 3-4 (Kolaborasi & Aksi Nyata)" },
+                    { num: 4, role: "Icebreaking & transisi interaktif" },
+                    { num: 5, role: "Revisi & koordinasi antar divisi" }
+                ],
+                deadlines: [
+                    { date: "19 Okt", task: "Jenis aktivitas fix" },
+                    { date: "22 Okt", task: "Rencana kegiatan final dengan bukti progres" },
+                    { date: "26 Okt", task: "Siap dilaksanakan" }
+                ],
+                tasks: [
+                    { id: "c1", text: "Membuat 3 slide progres di Google Slides / Canva" },
+                    { id: "c2", text: "Menyusun Rundown 120 Menit Inspiration Class" },
+                    { id: "c3", text: "Merancang Aktivitas STEAM 1: Water Filter Challenge (Durasi 30')" },
+                    { id: "c4", text: "Merancang Aktivitas STEAM 2: Paper Bridge Challenge (Durasi 30')" },
+                    { id: "c5", text: "Merancang Aktivitas STEAM 3: Seed Bomb / Green Action (Durasi 25')" },
+                    { id: "c6", text: "Menyusun 3 Sesi Icebreaking & Transisi Kreatif" },
+                    { id: "c7", text: "Finalisasi modul alur kegiatan & instruksi guru/fasilitator" },
+                    { id: "c8", text: "Simpan & update link slide di folder Drive 01 - IMPACT Conceptors" }
+                ],
+                slides: {
+                    slide1: "Tanggung jawab tim, Target kerja, Pembagian PIC (1-5), Deadline utama",
+                    slide2: "Rancangan aktivitas STEAM (Tujuan, konsep STEAM, durasi, alur, output) & Contoh ide Icebreaking",
+                    slide3: "Pekerjaan berikutnya, Kebutuhan & dukungan ke Designer/OPS, Kendala, Target penyelesaian"
+                }
+            },
+            designers: {
+                id: "designers",
+                name: "Impact Designers",
+                role: "Desainer Media & Alat Peraga",
+                color: "from-pink-500 to-rose-600",
+                badgeColor: "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20",
+                icon: "fa-palette",
+                driveFolder: "02 - IMPACT Designers",
+                mission: "Merancang dan menyiapkan media, alat peraga, dan worksheet yang kreatif, sesuai konsep aktivitas, aman digunakan, dan mudah dipahami siswa SD di Pangandaran.",
+                targets: [
+                    "Desain media untuk 2-4 aktivitas STEAM (sesuai konsep)",
+                    "Media menarik, aman, dan mudah digunakan",
+                    "Siap untuk diproduksi / dibuat",
+                    "Berkolaborasi dengan Conceptors dan OPS Crew"
+                ],
+                pics: [
+                    { num: 1, role: "Desain media A01 (Water Filter Challenge)" },
+                    { num: 2, role: "Desain media A02 (Paper Bridge Challenge)" },
+                    { num: 3, role: "Desain media A03 (Seed Bomb / Green Action)" },
+                    { num: 4, role: "Worksheet & petunjuk lembar kerja siswa" },
+                    { num: 5, role: "Revisi & quality check produk desain" }
+                ],
+                deadlines: [
+                    { date: "19 Okt", task: "Desain awal lengkap (semua aktivitas)" },
+                    { date: "22 Okt", task: "Desain final + bukti progres pembuatan" },
+                    { date: "26 Okt", task: "Media siap digunakan" }
+                ],
+                tasks: [
+                    { id: "d1", text: "Membuat 3 slide progres di Google Slides / Canva" },
+                    { id: "d2", text: "Desain poster visual lapisan penyaring air & label (A01)" },
+                    { id: "d3", text: "Desain template pola jembatan & kartu tantangan (A02)" },
+                    { id: "d4", text: "Desain poster langkah pembuatan & label bola benih (A03)" },
+                    { id: "d5", text: "Desain Worksheet Lembar Kerja Siswa (Identitas, Observasi, Evaluasi)" },
+                    { id: "d6", text: "Uji coba prototipe visual & ukuran cetak" },
+                    { id: "d7", text: "Koordinasi dengan OPS Crew untuk bahan baku produksi" },
+                    { id: "d8", text: "Simpan & update link slide di folder Drive 02 - IMPACT Designers" }
+                ],
+                slides: {
+                    slide1: "Tanggung jawab tim, Target kerja, Pembagian PIC (1-5), Deadline utama",
+                    slide2: "Daftar media & worksheet (Sketsa, visual poster, template pola, status progres)",
+                    slide3: "Finalisasi desain, Persiapan produksi & prototipe, Kendala, Target penyelesaian"
+                }
+            },
+            ops: {
+                id: "ops",
+                name: "Impact OPS Crew",
+                role: "Operasional, Bahan & Logistik",
+                color: "from-emerald-500 to-teal-700",
+                badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+                icon: "fa-boxes-packing",
+                driveFolder: "03 - IMPACT OPS Crew",
+                mission: "Menyiapkan seluruh kebutuhan alat, bahan, dan logistik untuk memastikan setiap kegiatan Inspiration Class berjalan lancar, aman, dan sesuai rencana.",
+                targets: [
+                    "Identifikasi kebutuhan untuk 2-4 aktivitas STEAM",
+                    "Buat daftar alat, bahan, dan jumlah",
+                    "Susun estimasi anggaran biaya",
+                    "Tentukan sumber pengadaan (Beli / Disediakan Sekolah)",
+                    "Koordinasi dengan Conceptors dan Designers",
+                    "Menyiapkan logistik & peralatan hingga hari pelaksanaan"
+                ],
+                pics: [
+                    { num: 1, role: "Inventaris & daftar kebutuhan alat/bahan" },
+                    { num: 2, role: "Estimasi anggaran & pencatatan biaya" },
+                    { num: 3, role: "Pengadaan & penyimpanan logistik" },
+                    { num: 4, role: "Pengecekan kelayakan peralatan & kelengkapan" },
+                    { num: 5, role: "Keamanan, penataan & rencana cadangan" }
+                ],
+                deadlines: [
+                    { date: "19 Okt", task: "Daftar kebutuhan & anggaran final (Lock Activity & Budget)" },
+                    { date: "22 Okt", task: "Bukti progres pengadaan dan persiapan logistik" },
+                    { date: "26 Okt", task: "Semua perlengkapan siap digunakan & dikemas aman" }
+                ],
+                tasks: [
+                    { id: "o1", text: "Membuat 3 slide progres di Google Slides / Canva" },
+                    { id: "o2", text: "Mengidentifikasi daftar alat/bahan A01, A02, A03 bersama Conceptors" },
+                    { id: "o3", text: "Menyusun tabel estimasi harga & total anggaran (RAB)" },
+                    { id: "o4", text: "Mengelompokkan barang (Tersedia di sekolah vs Harus Dibeli)" },
+                    { id: "o5", text: "Pelaksanaan pembelian & pengumpulan bahan baku" },
+                    { id: "o6", text: "Pengecekan kelayakan alat & packing per box kelompok aktivitas" },
+                    { id: "o7", text: "Koordinasi penyimpanan & moda transportasi keberangkatan" },
+                    { id: "o8", text: "Simpan & update link slide di folder Drive 03 - IMPACT OPS Crew" }
+                ],
+                slides: {
+                    slide1: "Tanggung jawab tim, Target kerja, Pembagian PIC (1-5), Deadline utama",
+                    slide2: "Tabel kebutuhan & Anggaran (Alat/bahan, jumlah, harga satuan, sumber, status)",
+                    slide3: "Alur persiapan logistik, Pengecekan, Pengemasan box, Kendala & Target"
+                }
+            },
+            media: {
+                id: "media",
+                name: "Impact Media Crew",
+                role: "Dokumentasi & Pubdok",
+                color: "from-cyan-500 to-blue-600",
+                badgeColor: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
+                icon: "fa-camera-retro",
+                driveFolder: "04 - IMPACT Media Crew",
+                mission: "Mendokumentasikan seluruh kegiatan Inspiration Class melalui foto, video, dan konten digital yang menarik untuk menyebarluaskan dampak kegiatan.",
+                targets: [
+                    "Rencana dokumentasi lengkap untuk 2-4 aktivitas STEAM",
+                    "Foto dan video yang berkualitas dan bercerita",
+                    "Rencana konten publikasi sebelum, selama, dan setelah kegiatan",
+                    "Pembagian peran tim yang jelas",
+                    "Sinkron dengan Conceptors, Designers, dan Story Hunters"
+                ],
+                pics: [
+                    { num: 1, role: "Koordinator & penyusun timeline dokumentasi" },
+                    { num: 2, role: "Foto kegiatan (Suasana, detail, ekspresi)" },
+                    { num: 3, role: "Video kegiatan (Time-lapse, proses, testimoni)" },
+                    { num: 4, role: "Konten media sosial (Reels, Story, Feeds)" },
+                    { num: 5, role: "Backup, penyortiran & penyimpanan data Cloud" }
+                ],
+                deadlines: [
+                    { date: "19 Okt", task: "Rencana dokumentasi & shot list final" },
+                    { date: "22 Okt", task: "Bukti progres (Contoh foto/video, desain konten)" },
+                    { date: "26 Okt", task: "Semua perlengkapan siap digunakan" }
+                ],
+                tasks: [
+                    { id: "m1", text: "Membuat 3 slide progres di Google Slides / Canva" },
+                    { id: "m2", text: "Menyusun Shot List & Jenis Dokumentasi per 120 menit rundown" },
+                    { id: "m3", text: "Membuat Storyboard Video Recap (Opening 5s, Aktivitas 20s, Closing 5s)" },
+                    { id: "m4", text: "Menyiapkan peralatan (Kamera/HP, Tripod, Mic Wireless, Lighting)" },
+                    { id: "m5", text: "Menyiapkan template desain konten sosial media (Cover, Frame, Subtitle)" },
+                    { id: "m6", text: "Uji coba pengambilan gambar & cek kualitas audio/pencahayaan" },
+                    { id: "m7", text: "Koordinasi sudut pengambilan gambar bersama Story Hunters" },
+                    { id: "m8", text: "Simpan & update link slide di folder Drive 04 - IMPACT Media Crew" }
+                ],
+                slides: {
+                    slide1: "Tanggung jawab tim, Target kerja, Pembagian PIC (1-5), Deadline utama",
+                    slide2: "Rencana Dokumentasi 120m, Shot List Aktivitas STEAM, Storyboard Recap Video",
+                    slide3: "Persiapan alat, Uji coba & Review hasil, Checkpoint Progres, Target H-1"
+                }
+            },
+            story: {
+                id: "story",
+                name: "Impact Story Hunters",
+                role: "Jurnalisme & Wawancara",
+                color: "from-purple-500 to-indigo-600",
+                badgeColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+                icon: "fa-magnifying-glass-location",
+                driveFolder: "05 - IMPACT Story Hunters",
+                mission: "Menggali, mendokumentasikan, dan menulis cerita tentang sekolah, siswa, guru, dan lingkungan di Pangandaran untuk menunjukkan dampak nyata dari kegiatan Inspiration Class.",
+                targets: [
+                    "Menentukan fokus cerita dan sudut pandang yang menarik",
+                    "Melakukan wawancara dengan narasumber utama",
+                    "Mengumpulkan foto/video pendukung cerita",
+                    "Menulis artikel atau profil sekolah",
+                    "Berkolaborasi dengan Media Crew",
+                    "Menghasilkan cerita yang inspiratif, faktual, dan etis"
+                ],
+                pics: [
+                    { num: 1, role: "Menghubungi narasumber dan mengatur jadwal" },
+                    { num: 2, role: "Menyiapkan daftar pertanyaan guru & kepala sekolah" },
+                    { num: 3, role: "Menyiapkan daftar pertanyaan siswa" },
+                    { num: 4, role: "Observasi lingkungan & mengumpulkan cerita lokal" },
+                    { num: 5, role: "Menulis artikel dan menyusun draft dokumentasi" }
+                ],
+                deadlines: [
+                    { date: "19 Okt", task: "Fokus cerita, calon narasumber, dan daftar pertanyaan fix" },
+                    { date: "22 Okt", task: "Bukti progres (Hasil wawancara awal / draft tulisan)" },
+                    { date: "26 Okt", task: "Artikel final dan semua dokumentasi siap dipublikasi" }
+                ],
+                tasks: [
+                    { id: "s1", text: "Membuat 3 slide progres di Google Slides / Canva" },
+                    { id: "s2", text: "Menentukan 1-3 Fokus Cerita (Sekolah Pesisir, Peran Guru, Lingkungan)" },
+                    { id: "s3", text: "Menyusun Daftar Pertanyaan Wawancara Guru & Kepala Sekolah" },
+                    { id: "s4", text: "Menyusun Daftar Pertanyaan Wawancara Siswa SD" },
+                    { id: "s5", text: "Menyusun Daftar Pertanyaan Tokoh Masyarakat / Orang Tua" },
+                    { id: "s6", text: "Merancang Outline Artikel Profil Sekolah & Layout Berita" },
+                    { id: "s7", text: "Koordinasi kutipan narasumber & photo pendukung bersama Media Crew" },
+                    { id: "s8", text: "Simpan & update link slide di folder Drive 05 - IMPACT Story Hunters" }
+                ],
+                slides: {
+                    slide1: "Tanggung jawab tim, Target kerja, Pembagian PIC (1-5), Deadline utama",
+                    slide2: "Fokus cerita & Narasumber, Daftar pertanyaan wawancara, Outline layout artikel",
+                    slide3: "Jadwal wawancara, Draft tulisan, Pendukung dokumentasi, Target publish"
+                }
+            }
+        };
+
+        // CURRENT APP STATE Persistent in localStorage
+        let appState = {
+            completedTasks: {},
+            divisionNotes: {},
+            currentTab: 'overview',
+            exportFormat: 'txt'
+        };
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            initTheme();
+            renderOverview();
+            switchTab('overview');
+        });
+
+        // LOAD FROM LOCALSTORAGE
+        function loadState() {
+            const saved = localStorage.getItem('impact_project_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState = { ...appState, ...parsed };
+                } catch(e) {
+                    console.error("Error loading state", e);
+                }
+            }
+        }
+
+        // SAVE TO LOCALSTORAGE
+        function saveState() {
+            localStorage.setItem('impact_project_state', JSON.stringify(appState));
+            updateBadgesAndStats();
+        }
+
+        // THEME TOGGLE
+        function initTheme() {
+            const themeBtn = document.getElementById('themeToggle');
+            themeBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                themeBtn.innerHTML = isDark ? '<i class="fa-solid fa-sun text-amber-400 text-sm"></i>' : '<i class="fa-solid fa-moon text-sm"></i>';
+            });
+        }
+
+        // SWITCH TAB LOGIC
+        function switchTab(tabId) {
+            appState.currentTab = tabId;
+            
+            // Highlight nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-teal-600', 'text-white', 'shadow-md', 'shadow-teal-600/20');
+                btn.classList.add('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
+                activeBtn.classList.add('bg-teal-600', 'text-white', 'shadow-md', 'shadow-teal-600/20');
+            }
+
+            // Toggle Tab Visibility
+            if (tabId === 'overview') {
+                document.getElementById('tab-overview').classList.remove('hidden');
+                document.getElementById('tab-division-container').classList.add('hidden');
+                document.getElementById('page-title').innerHTML = `<i class="fa-solid fa-chart-pie text-teal-600"></i> Project Overview & Dashboard`;
+                document.getElementById('page-subtitle').innerText = `Sistem pemantauan & alokasi tugas Inspiration Class SMK 1 Pangandaran`;
+                renderOverview();
+            } else {
+                document.getElementById('tab-overview').classList.add('hidden');
+                document.getElementById('tab-division-container').classList.remove('hidden');
+                renderDivisionTab(tabId);
+            }
+
+            updateBadgesAndStats();
+        }
+
+        // CALCULATE DIVISION PROGRESS
+        function getDivisionProgress(divId) {
+            const tasks = divisionsData[divId].tasks;
+            let done = 0;
+            tasks.forEach(t => {
+                if (appState.completedTasks[t.id]) done++;
+            });
+            const percent = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+            return { done, total: tasks.length, percent };
+        }
+
+        // UPDATE BADGES & OVERALL STATS
+        function updateBadgesAndStats() {
+            let totalTasksAll = 0;
+            let completedTasksAll = 0;
+
+            Object.keys(divisionsData).forEach(divId => {
+                const { done, total, percent } = getDivisionProgress(divId);
+                totalTasksAll += total;
+                completedTasksAll += done;
+
+                const badge = document.getElementById(`badge-${divId}`);
+                if (badge) {
+                    badge.innerText = `${done}/${total}`;
+                }
+            });
+
+            const overallPercent = totalTasksAll ? Math.round((completedTasksAll / totalTasksAll) * 100) : 0;
+            
+            const overallBadge = document.getElementById('badge-overview');
+            if (overallBadge) overallBadge.innerText = `${overallPercent}%`;
+
+            const elemPercent = document.getElementById('overall-percent');
+            if (elemPercent) elemPercent.innerText = `${overallPercent}%`;
+
+            const elemBar = document.getElementById('overall-bar');
+            if (elemBar) elemBar.style.width = `${overallPercent}%`;
+
+            const elemTotal = document.getElementById('total-tasks-count');
+            if (elemTotal) elemTotal.innerText = totalTasksAll;
+
+            const elemCompleted = document.getElementById('completed-tasks-count');
+            if (elemCompleted) elemCompleted.innerText = completedTasksAll;
+        }
+
+        // RENDER OVERVIEW TAB
+        function renderOverview() {
+            const container = document.getElementById('division-summary-cards');
+            container.innerHTML = '';
+
+            Object.keys(divisionsData).forEach(divId => {
+                const div = divisionsData[divId];
+                const { done, total, percent } = getDivisionProgress(divId);
+
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-5 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between";
+                card.onclick = () => switchTab(divId);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr ${div.color} flex items-center justify-center text-white text-sm shadow-md">
+                                    <i class="fa-solid ${div.icon}"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">${div.name}</h4>
+                                    <p class="text-xs text-slate-500">${div.role}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold px-2 py-0.5 rounded-full ${div.badgeColor} border">${percent}%</span>
+                        </div>
+
+                        <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 mb-4">
+                            ${div.mission}
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-500 mb-1">
+                            <span>Selesai: ${done} dari ${total} tugas</span>
+                            <span class="font-semibold text-slate-700 dark:text-slate-300">${percent}%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                            <div class="bg-gradient-to-r ${div.color} h-2 rounded-full transition-all duration-300" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Render All Tasks Checklist
+            renderAllTasksList();
+        }
+
+        // RENDER ALL TASKS ON OVERVIEW
+        function renderAllTasksList(filterKeyword = '') {
+            const container = document.getElementById('all-tasks-container');
+            container.innerHTML = '';
+
+            let count = 0;
+            Object.keys(divisionsData).forEach(divId => {
+                const div = divisionsData[divId];
+                
+                div.tasks.forEach(task => {
+                    if (filterKeyword && !task.text.toLowerCase().includes(filterKeyword.toLowerCase()) && !div.name.toLowerCase().includes(filterKeyword.toLowerCase())) {
+                        return;
+                    }
+
+                    count++;
+                    const isChecked = !!appState.completedTasks[task.id];
+                    const item = document.createElement('div');
+                    item.className = `p-3 rounded-xl border transition flex items-center justify-between ${isChecked ? 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-900/40' : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700/60'}`;
+
+                    item.innerHTML = `
+                        <div class="flex items-center space-x-3 min-w-0 pr-3">
+                            <input type="checkbox" id="chk-all-${task.id}" ${isChecked ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-slate-300 cursor-pointer">
+                            <label for="chk-all-${task.id}" class="text-xs text-slate-700 dark:text-slate-200 cursor-pointer truncate ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : ''}">
+                                ${task.text}
+                            </label>
+                        </div>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${div.badgeColor} border flex-shrink-0">
+                            ${div.name.replace('Impact ', '')}
+                        </span>
+                    `;
+                    container.appendChild(item);
+                });
+            });
+
+            if (count === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-400 py-4 text-center">Tidak ada tugas yang cocok dengan pencarian "${filterKeyword}".</div>`;
+            }
+        }
+
+        // SEARCH HANDLER
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (appState.currentTab === 'overview') {
+                renderAllTasksList(query);
+            }
+        }
+
+        // RENDER SPECIFIC DIVISION TAB
+        function renderDivisionTab(divId) {
+            const div = divisionsData[divId];
+            if (!div) return;
+
+            // Page Header Titles
+            document.getElementById('page-title').innerHTML = `<i class="fa-solid ${div.icon} text-teal-600"></i> ${div.name}`;
+            document.getElementById('page-subtitle').innerText = div.role + " - " + div.mission;
+
+            // Division Header Banner
+            const headerCard = document.getElementById('div-header-card');
+            headerCard.innerHTML = `
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr ${div.color} flex items-center justify-center text-white text-xl shadow-lg flex-shrink-0">
+                            <i class="fa-solid ${div.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-xl font-extrabold text-white">${div.name}</h3>
+                                <span class="text-xs bg-slate-700/80 text-teal-300 px-2 py-0.5 rounded-full border border-slate-600">Drive: ${div.driveFolder}</span>
+                            </div>
+                            <p class="text-xs text-slate-300 mt-1 max-w-2xl">${div.mission}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-700/60 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase">Fokus Utama</span>
+                        <span class="font-semibold text-slate-200">${div.targets[0]}</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase">Checkpoint 1</span>
+                        <span class="font-semibold text-amber-400">19 Okt 2026</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase">Checkpoint 2</span>
+                        <span class="font-semibold text-teal-400">22 Okt 2026</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase">Pelaksanaan</span>
+                        <span class="font-semibold text-emerald-400">26 Okt (Siap)</span>
+                    </div>
+                </div>
+            `;
+
+            // Render Checklist
+            renderDivisionChecklist(divId);
+
+            // Render 3 Slide PPT Cards
+            const slidesContainer = document.getElementById('div-ppt-slides');
+            slidesContainer.innerHTML = `
+                <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-teal-600 dark:text-teal-400">SLIDE 1</span>
+                            <span class="text-[10px] bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded font-mono text-slate-600 dark:text-slate-300">OUR MISSION</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${div.slides.slide1}</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-teal-600 dark:text-teal-400">SLIDE 2</span>
+                            <span class="text-[10px] bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded font-mono text-slate-600 dark:text-slate-300">WORK IN PROGRESS</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${div.slides.slide2}</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-teal-600 dark:text-teal-400">SLIDE 3</span>
+                            <span class="text-[10px] bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded font-mono text-slate-600 dark:text-slate-300">NEXT STEPS</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${div.slides.slide3}</p>
+                    </div>
+                </div>
+            `;
+
+            // Render Interactive Preview Generator Tools for this division
+            renderInteractiveTools(divId);
+
+            // Render PIC List
+            const picContainer = document.getElementById('div-pic-list');
+            picContainer.innerHTML = '';
+            div.pics.forEach(p => {
+                const item = document.createElement('div');
+                item.className = "flex items-start space-x-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/50";
+                item.innerHTML = `
+                    <div class="w-7 h-7 rounded-lg bg-teal-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                        ${p.num}
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-800 dark:text-slate-200">PIC ${p.num}</div>
+                        <div class="text-xs text-slate-600 dark:text-slate-400">${p.role}</div>
+                    </div>
+                `;
+                picContainer.appendChild(item);
+            });
+
+            // Render Deadlines
+            const deadlineContainer = document.getElementById('div-deadlines-list');
+            deadlineContainer.innerHTML = '';
+            div.deadlines.forEach(d => {
+                const item = document.createElement('div');
+                item.className = "flex items-start space-x-3";
+                item.innerHTML = `
+                    <div class="w-2 h-2 rounded-full bg-amber-500 mt-1.5 flex-shrink-0"></div>
+                    <div>
+                        <span class="font-bold text-xs text-amber-600 dark:text-amber-400">${d.date}:</span>
+                        <span class="text-xs text-slate-600 dark:text-slate-300 ml-1">${d.task}</span>
+                    </div>
+                `;
+                deadlineContainer.appendChild(item);
+            });
+
+            // Set Saved Notes
+            const textarea = document.getElementById('div-notes-textarea');
+            textarea.value = appState.divisionNotes[divId] || '';
+        }
+
+        // RENDER DIVISION CHECKLIST
+        function renderDivisionChecklist(divId) {
+            const div = divisionsData[divId];
+            const container = document.getElementById('div-checklist-list');
+            container.innerHTML = '';
+
+            const { done, total, percent } = getDivisionProgress(divId);
+            document.getElementById('div-progress-badge').innerText = `${percent}% Completed (${done}/${total})`;
+
+            div.tasks.forEach(task => {
+                const isChecked = !!appState.completedTasks[task.id];
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-xl border transition flex items-center space-x-3 ${isChecked ? 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-900/40' : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700/60'}`;
+
+                item.innerHTML = `
+                    <input type="checkbox" id="chk-${task.id}" ${isChecked ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-slate-300 cursor-pointer">
+                    <label for="chk-${task.id}" class="text-xs font-medium text-slate-800 dark:text-slate-200 cursor-pointer ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : ''}">
+                        ${task.text}
+                    </label>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // TOGGLE TASK STATUS
+        function toggleTask(taskId) {
+            appState.completedTasks[taskId] = !appState.completedTasks[taskId];
+            saveState();
+
+            if (appState.currentTab === 'overview') {
+                renderOverview();
+            } else {
+                renderDivisionChecklist(appState.currentTab);
+            }
+        }
+
+        // SAVE NOTES
+        function saveNotes() {
+            const divId = appState.currentTab;
+            if (divId && divId !== 'overview') {
+                const val = document.getElementById('div-notes-textarea').value;
+                appState.divisionNotes[divId] = val;
+                saveState();
+            }
+        }
+
+        // RENDER INTERACTIVE TOOLS ACCORDING TO DIVISION SLIDES
+        function renderInteractiveTools(divId) {
+            const container = document.getElementById('div-interactive-tools');
+            
+            if (divId === 'media') {
+                container.innerHTML = `
+                    <h4 class="font-bold text-slate-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-cyan-500"></i> Contoh Rencana Dokumentasi & Shot List (120 Menit)
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left text-slate-600 dark:text-slate-300">
+                            <thead class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-bold">
+                                <tr>
+                                    <th class="p-2.5 rounded-l-lg">Waktu</th>
+                                    <th class="p-2.5">Kegiatan STEAM</th>
+                                    <th class="p-2.5">Jenis Dokumentasi</th>
+                                    <th class="p-2.5 rounded-r-lg">Output Konten</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <tr>
+                                    <td class="p-2.5 font-mono text-teal-600">00–10</td>
+                                    <td class="p-2.5 font-semibold">Pembukaan & Icebreaking 1</td>
+                                    <td class="p-2.5">Foto suasana, video singkat (15-30s)</td>
+                                    <td class="p-2.5">Instagram story & highlight</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-mono text-teal-600">10–40</td>
+                                    <td class="p-2.5 font-semibold">Water Filter Challenge (A01)</td>
+                                    <td class="p-2.5">Foto proses, video close-up alat, wawancara siswa</td>
+                                    <td class="p-2.5">Reels: proses & hasil kegiatan</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-mono text-teal-600">45–75</td>
+                                    <td class="p-2.5 font-semibold">Paper Bridge Challenge (A02)</td>
+                                    <td class="p-2.5">Foto proses, time-lapse, video interaksi</td>
+                                    <td class="p-2.5">Reels / short video: kolaborasi siswa</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-mono text-teal-600">80–105</td>
+                                    <td class="p-2.5 font-semibold">Seed Bomb / Green Action (A03)</td>
+                                    <td class="p-2.5">Foto langkah pembuatan, video hasil, wawancara</td>
+                                    <td class="p-2.5">Reels: aksi nyata lingkungan</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-mono text-teal-600">105–120</td>
+                                    <td class="p-2.5 font-semibold">Refleksi & Penutupan</td>
+                                    <td class="p-2.5">Foto kelompok, video testimoni siswa/guru</td>
+                                    <td class="p-2.5">Video recap (1-2 menit)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (divId === 'ops') {
+                container.innerHTML = `
+                    <h4 class="font-bold text-slate-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-emerald-500"></i> Contoh Tabel Kebutuhan & Anggaran Logistik
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left text-slate-600 dark:text-slate-300">
+                            <thead class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-bold">
+                                <tr>
+                                    <th class="p-2">Aktivitas</th>
+                                    <th class="p-2">Alat / Bahan</th>
+                                    <th class="p-2">Jumlah</th>
+                                    <th class="p-2">Total (Rp)</th>
+                                    <th class="p-2">Sumber</th>
+                                    <th class="p-2">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <tr>
+                                    <td class="p-2 font-bold">A01 Water Filter</td>
+                                    <td class="p-2">Botol plastik, Pasir, Kerikil</td>
+                                    <td class="p-2">5 pcs + 2kg</td>
+                                    <td class="p-2 font-mono">20.000</td>
+                                    <td class="p-2">Dibeli & Sekolah</td>
+                                    <td class="p-2"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">Siap</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">A02 Paper Bridge</td>
+                                    <td class="p-2">Kertas karton, Sedotan, Lakban</td>
+                                    <td class="p-2">10 lbr + 50 pcs</td>
+                                    <td class="p-2 font-mono">67.000</td>
+                                    <td class="p-2">Dibeli</td>
+                                    <td class="p-2"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">Progres</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">A03 Seed Bomb</td>
+                                    <td class="p-2">Tanah, Biji tanaman, Wadah</td>
+                                    <td class="p-2">2kg + 5 paket</td>
+                                    <td class="p-2 font-mono">43.000</td>
+                                    <td class="p-2">Dibeli & Sekolah</td>
+                                    <td class="p-2"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">Progres</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (divId === 'conceptors') {
+                container.innerHTML = `
+                    <h4 class="font-bold text-slate-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-amber-500"></i> Alur Aktivitas STEAM (Contoh: Water Filter)
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
+                        <div class="p-3 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-900/40 rounded-xl">
+                            <span class="font-bold text-amber-600 block">1. Pembukaan (5')</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-400">Tanya jawab singkat pentingnya air bersih.</span>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-900/40 rounded-xl">
+                            <span class="font-bold text-amber-600 block">2. Eksplorasi (10')</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-400">Siswa mengamati bahan & memprediksi urutan.</span>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-900/40 rounded-xl">
+                            <span class="font-bold text-amber-600 block">3. Eksperimen (10')</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-400">Siswa membuat model penyaring air.</span>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-900/40 rounded-xl">
+                            <span class="font-bold text-amber-600 block">4. Uji Coba (5')</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-400">Membandingkan hasil sebelum & sesudah.</span>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-900/40 rounded-xl">
+                            <span class="font-bold text-amber-600 block">5. Refleksi (5')</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-400">Diskusi bagaimana menjaga air tetap bersih.</span>
+                        </div>
+                    </div>
+                `;
+            } else if (divId === 'designers') {
+                container.innerHTML = `
+                    <h4 class="font-bold text-slate-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-ruler text-pink-500"></i> Rencana Produksi Media & Worksheet
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="font-bold text-pink-600 mb-1">A01 - Water Filter</div>
+                            <p class="text-slate-600 dark:text-slate-400">Model penyaring air + Poster visual lapisan penyaring. Label botol & instruksi.</p>
+                        </div>
+                        <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="font-bold text-pink-600 mb-1">A02 - Paper Bridge</div>
+                            <p class="text-slate-600 dark:text-slate-400">Template pola jembatan untuk digunting + Kartu tantangan & aturan uji kekuatan.</p>
+                        </div>
+                        <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="font-bold text-pink-600 mb-1">A03 - Seed Bomb</div>
+                            <p class="text-slate-600 dark:text-slate-400">Poster langkah pembuatan + Worksheet lembar refleksi lingkungan.</p>
+                        </div>
+                    </div>
+                `;
+            } else if (divId === 'story') {
+                container.innerHTML = `
+                    <h4 class="font-bold text-slate-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-purple-500"></i> Panduan Pertanyaan Wawancara Narasumber
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="p-3 bg-purple-50 dark:bg-slate-900 border border-purple-200 dark:border-purple-900/40 rounded-xl">
+                            <span class="font-bold text-purple-600 block mb-1">Untuk Guru</span>
+                            <ul class="list-disc list-inside text-slate-600 dark:text-slate-400 space-y-1 text-[11px]">
+                                <li>Tantangan terbesar mengajar di sini?</li>
+                                <li>Penggunaan lingkungan sekitar dalam belajar?</li>
+                                <li>Harapan untuk sekolah ke depan?</li>
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-purple-50 dark:bg-slate-900 border border-purple-200 dark:border-purple-900/40 rounded-xl">
+                            <span class="font-bold text-purple-600 block mb-1">Untuk Siswa SD</span>
+                            <ul class="list-disc list-inside text-slate-600 dark:text-slate-400 space-y-1 text-[11px]">
+                                <li>Kegiatan belajar yang paling disukai?</li>
+                                <li>Cita-cita & apa yang membuat sekolah istimewa?</li>
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-purple-50 dark:bg-slate-900 border border-purple-200 dark:border-purple-900/40 rounded-xl">
+                            <span class="font-bold text-purple-600 block mb-1">Untuk Kepsek / Tokoh</span>
+                            <ul class="list-disc list-inside text-slate-600 dark:text-slate-400 space-y-1 text-[11px]">
+                                <li>Peran sekolah bagi masyarakat sekitar?</li>
+                                <li>Keunikan / kekuatan utama sekolah ini?</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // EXPORT MODAL LOGIC
+        function openExportModal() {
+            document.getElementById('exportModal').classList.remove('hidden');
+            generateExportText();
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.add('hidden');
+        }
+
+        function setExportFormat(fmt) {
+            appState.exportFormat = fmt;
+            document.getElementById('btn-fmt-txt').className = fmt === 'txt' ? 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white' : 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300';
+            document.getElementById('btn-fmt-md').className = fmt === 'md' ? 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white' : 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300';
+            generateExportText();
+        }
+
+        function generateExportText() {
+            const textarea = document.getElementById('exportTextarea');
+            const fmt = appState.exportFormat;
+            let output = '';
+
+            if (fmt === 'txt') {
+                output += `===================================================================\n`;
+                output += `PEMBAGIAN TUGAS & PROGRES DIVISI - IMPACT PROJECT (SMK 1 PANGANDARAN)\n`;
+                output += `===================================================================\n\n`;
+
+                Object.keys(divisionsData).forEach((divId, index) => {
+                    const div = divisionsData[divId];
+                    const { done, total, percent } = getDivisionProgress(divId);
+                    
+                    output += `[${index + 1}] ${div.name.toUpperCase()} (Progres: ${percent}%)\n`;
+                    output += `-------------------------------------------------------------------\n`;
+                    output += `Misi: ${div.mission}\n`;
+                    output += `Pembagian PIC:\n`;
+                    div.pics.forEach(p => {
+                        output += `  - PIC ${p.num}: ${p.role}\n`;
+                    });
+                    output += `Checklist Tugas:\n`;
+                    div.tasks.forEach(t => {
+                        const status = appState.completedTasks[t.id] ? '[x]' : '[ ]';
+                        output += `  ${status} ${t.text}\n`;
+                    });
+                    if (appState.divisionNotes[divId]) {
+                        output += `Catatan Divisi:\n  ${appState.divisionNotes[divId]}\n`;
+                    }
+                    output += `\n`;
+                });
+            } else {
+                output += `# IMPACT PROJECT - Pembagian Tugas & Status Progres\n\n`;
+                output += `**Lokasi Kegiatan:** Pangandaran (27–30 Oktober 2026)\n\n`;
+
+                Object.keys(divisionsData).forEach((divId) => {
+                    const div = divisionsData[divId];
+                    const { done, total, percent } = getDivisionProgress(divId);
+
+                    output += `## ${div.name} (${percent}% Selesai)\n`;
+                    output += `> ${div.mission}\n\n`;
+                    output += `### Pembagian PIC\n`;
+                    div.pics.forEach(p => {
+                        output += `- **PIC ${p.num}:** ${p.role}\n`;
+                    });
+                    output += `\n### Checklist Tugas\n`;
+                    div.tasks.forEach(t => {
+                        const status = appState.completedTasks[t.id] ? 'x' : ' ';
+                        output += `- [${status}] ${t.text}\n`;
+                    });
+                    if (appState.divisionNotes[divId]) {
+                        output += `\n**Catatan Internal:**\n${appState.divisionNotes[divId]}\n`;
+                    }
+                    output += `\n---\n\n`;
+                });
+            }
+
+            textarea.value = output;
+        }
+
+        function copyExportText() {
+            const textarea = document.getElementById('exportTextarea');
+            textarea.select();
+            document.execCommand('copy');
+            const status = document.getElementById('exportStatusText');
+            status.innerText = "Berhasil di-copy ke clipboard!";
+            status.className = "text-xs text-emerald-500 font-bold";
+            setTimeout(() => {
+                status.innerText = "Siap di-copy atau di-download";
+                status.className = "text-xs text-slate-500";
+            }, 2500);
+        }
+
+        function downloadExportText() {
+            const text = document.getElementById('exportTextarea').value;
+            const ext = appState.exportFormat === 'txt' ? 'txt' : 'md';
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pembagian_tugas_impact_project.${ext}`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // GITHUB GUIDE MODAL LOGIC
+        function openGithubGuideModal() {
+            document.getElementById('githubModal').classList.remove('hidden');
+        }
+
+        function closeGithubGuideModal() {
+            document.getElementById('githubModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
